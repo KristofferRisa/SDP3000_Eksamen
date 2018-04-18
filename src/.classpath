@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path=""/>
+	<classpathentry kind="var" path="commons-logging-1.2"/>
+	<classpathentry kind="var" path="easylib2"/>
+	<classpathentry kind="var" path="pdfbox-2.0.9"/>
+	<classpathentry kind="output" path=""/>
+</classpath>
