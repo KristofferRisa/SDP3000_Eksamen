@@ -5,5 +5,6 @@
 	<classpathentry kind="var" path="commons-logging-1.2"/>
 	<classpathentry kind="var" path="easylib2"/>
 	<classpathentry kind="var" path="pdfbox-2.0.9"/>
+	<classpathentry kind="var" path="fontbox-2.0.3"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
