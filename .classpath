@@ -6,7 +6,8 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="/Users/torketrommel/Dev/git repositories/pdfbox-app-2.0.9.jar"/>
-	<classpathentry kind="lib" path="/Users/torketrommel/Dev/git repositories/fontbox-2.0.9.jar"/>
+	<classpathentry kind="var" path="pdfbox-2.0.9"/>
+	<classpathentry kind="var" path="fontbox-2.0.9"/>
+	<classpathentry kind="var" path="commons-logging-1.2"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
