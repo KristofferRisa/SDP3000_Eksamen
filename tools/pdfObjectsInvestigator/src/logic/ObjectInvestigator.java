@@ -58,11 +58,9 @@ public class ObjectInvestigator {
 				PDDocument pdfDocument = PDDocument.load(f);
 				System.out.println(pdfDocument.getVersion());
 				investigate(pdfDocument);
-			
 				
 				printOutTheDocumentDictionary(pdfDocument);
-				
-						
+					
 //				PDPageTree pagesFromCatalog = catalog.getPages();
 //				System.out.println("pagesFromCatalog size = " + pagesFromCatalog.spliterator().getExactSizeIfKnown());
 				System.out.println(pdfDocument.getVersion());

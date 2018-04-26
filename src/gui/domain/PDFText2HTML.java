@@ -49,11 +49,19 @@ public class PDFText2HTML extends PDFTextStripper
     public PDFText2HTML() throws IOException
     {
         super();
+        
         setLineSeparator(LINE_SEPARATOR);
-        setParagraphStart("<p>");
+        
+        //Finn farge
+        String color = "";
+        
+        setParagraphStart("<p style=\"color:\""+color+">");
         setParagraphEnd("</p>"+ LINE_SEPARATOR);
+        
         setPageStart("<div style=\"page-break-before:always; page-break-after:always\">");
+        
         setPageEnd("</div>"+ LINE_SEPARATOR);
+        
         setArticleStart(LINE_SEPARATOR);
         setArticleEnd(LINE_SEPARATOR);
     }

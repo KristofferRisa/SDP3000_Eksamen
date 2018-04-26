@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -66,6 +69,7 @@ public class Editorview extends JPanel implements DocumentListener {
 			doc = PDDocument.load(f);
             //content = new PDFTextStripper().getText(doc);
             content = new PDFText2HTML().getText(doc);
+                
 		}
 		catch (IOException e) {
             System.out.println(e.getMessage());
