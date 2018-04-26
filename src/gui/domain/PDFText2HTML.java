@@ -17,6 +17,8 @@ package gui.domain;
  */
 
 
+import java.awt.peer.TrayIconPeer;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,8 +26,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
+
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageTree;
+import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.font.PDFontDescriptor;
+import org.apache.pdfbox.pdmodel.graphics.PDXObject;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
 
@@ -82,6 +91,25 @@ public class PDFText2HTML extends PDFTextStripper
 //        buf.append("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=\"UTF-8\">\n");
         buf.append("</head>\n");
         buf.append("<body>\n");
+        
+        
+        //Bilder - forsøk men se her da det er ekstremt vanskelig : https://issues.apache.org/jira/browse/PDFBOX-3926
+        //Skaffe posisjon: http://svn.apache.org/viewvc/pdfbox/trunk/examples/src/main/java/org/apache/pdfbox/examples/util/PrintImageLocations.java?view=markup
+        PDPageTree list = document.getPages();
+        for (PDPage page : list) {
+            PDResources pdResources = page.getResources();
+            for (COSName c : pdResources.getXObjectNames()) {
+                PDXObject o = pdResources.getXObject(c);
+                if (o instanceof org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) {
+                	long fileName = System.nanoTime();
+                    File file = new File("c:/tempimg/" + fileName + ".png");
+                    buf.append("<img src=\"file:" + "/" +fileName + "/" + ">\n");
+                    ImageIO.write(((org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject)o).getImage(), "png", file);
+                }
+            }
+        }
+        
+        
         super.writeString(buf.toString());
     }
     
