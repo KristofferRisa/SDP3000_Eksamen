@@ -117,7 +117,7 @@ public class PDFText2HTML extends PDFTextStripper
     			stripper.setStartPage(doc.getNumberOfPages()-1);
     			stripper.setEndPage(doc.getNumberOfPages()-1);
     			pageText = stripper.getText(doc);
-    			System.out.println(pageText);
+    			
 
     		}
     	}
