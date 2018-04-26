@@ -17,6 +17,7 @@ package gui.domain;
  */
 
 
+import java.awt.peer.TrayIconPeer;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -100,8 +101,9 @@ public class PDFText2HTML extends PDFTextStripper
             for (COSName c : pdResources.getXObjectNames()) {
                 PDXObject o = pdResources.getXObject(c);
                 if (o instanceof org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) {
-                    File file = new File("c:/tempimg/" + System.nanoTime() + ".png");
-                    buf.append("<img src=\"c:/tempimg/" +file.toString() + "\"" + ">\n");
+                	long fileName = System.nanoTime();
+                    File file = new File("c:/tempimg/" + fileName + ".png");
+                    buf.append("<img src=\"file:" + "/" +fileName + "/" + ">\n");
                     ImageIO.write(((org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject)o).getImage(), "png", file);
                 }
             }
