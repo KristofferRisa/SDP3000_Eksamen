@@ -20,6 +20,9 @@ package gui.domain;
 import java.awt.peer.TrayIconPeer;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -96,14 +99,23 @@ public class PDFText2HTML extends PDFTextStripper
         //Bilder - forsøk men se her da det er ekstremt vanskelig : https://issues.apache.org/jira/browse/PDFBOX-3926
         //Skaffe posisjon: http://svn.apache.org/viewvc/pdfbox/trunk/examples/src/main/java/org/apache/pdfbox/examples/util/PrintImageLocations.java?view=markup
         PDPageTree list = document.getPages();
+        //Finne relativ bane
+        Path path = Paths.get(System.getProperty("user.home"),"tempimg/");  
         for (PDPage page : list) {
             PDResources pdResources = page.getResources();
             for (COSName c : pdResources.getXObjectNames()) {
                 PDXObject o = pdResources.getXObject(c);
                 if (o instanceof org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) {
+                	//Debug filbane          	
+                	System.out.println("Relativ bane: " + path);
+                	//Lage unikt filnavn
                 	long fileName = System.nanoTime();
-                    File file = new File("c:/tempimg/" + fileName + ".png");
-                    buf.append("<img src=\"file:" + "/" +fileName + "/" + ">\n");
+                	//assosiere path objektet med variabelen filbane
+                	String filbane = path.toString();
+                	//Lagre bildefil til relativ bane
+                    File file = new File(filbane + fileName + ".png");
+                    //skrive filbane i htmldokumentet
+                    buf.append("<img src=\"file:/" + filbane +fileName + ".png\">\n");
                     ImageIO.write(((org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject)o).getImage(), "png", file);
                 }
             }
