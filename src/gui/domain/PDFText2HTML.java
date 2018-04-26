@@ -22,9 +22,15 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageTree;
+import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDFontDescriptor;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
@@ -39,7 +45,6 @@ import org.apache.pdfbox.text.TextPosition;
 public class PDFText2HTML extends PDFTextStripper
 {
     private static final int INITIAL_PDF_TO_HTML_BYTES = 8192;
-
     private final FontState fontState = new FontState();
 
     /**
@@ -48,7 +53,8 @@ public class PDFText2HTML extends PDFTextStripper
      */
     public PDFText2HTML() throws IOException
     {
-        super();
+    	super();
+    	
         setLineSeparator(LINE_SEPARATOR);
         setParagraphStart("<p>");
         setParagraphEnd("</p>"+ LINE_SEPARATOR);
@@ -76,14 +82,53 @@ public class PDFText2HTML extends PDFTextStripper
         StringBuilder buf = new StringBuilder(INITIAL_PDF_TO_HTML_BYTES);
 //        buf.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"" + "\n"
 //                + "\"http://www.w3.org/TR/html4/loose.dtd\">\n");
+
         buf.append("<html>\n");
         buf.append("<head>\n");
-        buf.append("<title>").append(escape(getTitle())).append("</title>\n");
-//        buf.append("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=\"UTF-8\">\n");
+        buf.append("<titkle>").append(escape(getTitle())).append("</title>\n");
+        buf.append("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=\"UTF-8\">\n");
         buf.append("</head>\n");
-        buf.append("<body>\n");
+        findStuffForFooter(document);
+        //buf.append("<body>\n");
+        getFontFamily(buf,document);
         super.writeString(buf.toString());
     }
+    
+    protected void getFontFamily(StringBuilder buf, PDDocument doc) throws IOException {
+    	for(int i = 0; i < doc.getNumberOfPages(); i++) {
+    		PDPage page = doc.getPage(i);
+    		PDResources res = page.getResources();
+    		for(COSName fontName : res.getFontNames()) {
+    			PDFont font = res.getFont(fontName);
+    			System.out.println(font);
+    			buf.append("<body style='font-family:"+font+"'>");
+    			break;
+    		}
+    		break;
+    	}
+    }
+    
+    protected void findStuffForFooter(PDDocument doc) throws IOException {
+    	String pageText = null;
+    	PDFTextStripper stripper = new PDFTextStripper();
+    	for(int i = 0; i < doc.getNumberOfPages(); i++) {
+    		PDPage page = doc.getPage(i);
+    		if(page == doc.getPage(doc.getNumberOfPages()-1)) {
+    			stripper.setStartPage(doc.getNumberOfPages()-1);
+    			stripper.setEndPage(doc.getNumberOfPages()-1);
+    			pageText = stripper.getText(doc);
+    			System.out.println(pageText);
+
+    		}
+    	}
+		
+    	
+    	
+    	
+    	
+    	
+    }
+    
     
     /**
      * {@inheritDoc}

@@ -26,6 +26,7 @@ public class Editorview extends JPanel implements DocumentListener {
 		setLayout(new BorderLayout());
 		add(new JScrollPane(text));
 		text.getDocument().addDocumentListener(this);
+		
 	}
 	
 	public void save() {
