@@ -38,6 +38,7 @@ import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.font.PDFontDescriptor;
 import org.apache.pdfbox.pdmodel.graphics.PDXObject;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
 
@@ -96,7 +97,7 @@ public class PDFText2HTML extends PDFTextStripper
         buf.append("<body>\n");
         
         
-        //Bilder - forsøk men se her da det er ekstremt vanskelig : https://issues.apache.org/jira/browse/PDFBOX-3926
+        //Bilder - forsï¿½k men se her da det er ekstremt vanskelig : https://issues.apache.org/jira/browse/PDFBOX-3926
         //Skaffe posisjon: http://svn.apache.org/viewvc/pdfbox/trunk/examples/src/main/java/org/apache/pdfbox/examples/util/PrintImageLocations.java?view=markup
         PDPageTree list = document.getPages();
         //Finne relativ bane
@@ -104,8 +105,24 @@ public class PDFText2HTML extends PDFTextStripper
         for (PDPage page : list) {
             PDResources pdResources = page.getResources();
             for (COSName c : pdResources.getXObjectNames()) {
-                PDXObject o = pdResources.getXObject(c);
-                if (o instanceof org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) {
+                PDXObject xobject = pdResources.getXObject(c);
+               
+            	
+            	
+            		
+                if (xobject instanceof PDImageXObject) {
+                	
+                	PDImageXObject image = (PDImageXObject)xobject;
+                	
+                	//bilde hÃ¸yde og bredde
+                	int imageWidth = image.getWidth();
+                	int imageHeight = image.getHeight();
+                	
+                	
+                	//Bilde Posisjon
+                	//Matrix positem = getGraphicsState().getCurrentTransformationMatrix();
+                	
+                	
                 	//Debug filbane          	
                 	System.out.println("Relativ bane: " + path);
                 	//Lage unikt filnavn
@@ -115,15 +132,16 @@ public class PDFText2HTML extends PDFTextStripper
                 	//Lagre bildefil til relativ bane
                     File file = new File(filbane + fileName + ".png");
                     //skrive filbane i htmldokumentet
-                    buf.append("<img src=\"file:/" + filbane +fileName + ".png\">\n");
-                    ImageIO.write(((org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject)o).getImage(), "png", file);
+                    buf.append("<img src=\"file:/" + filbane +fileName + ".png\" style= width:" + imageWidth + "px; height:"+ imageHeight+ "px;\" >\n");
+                    ImageIO.write(((PDImageXObject)xobject).getImage(), "png", file);
                 }
+            
             }
         }
         
-        
         super.writeString(buf.toString());
     }
+    
     
     /**
      * {@inheritDoc}

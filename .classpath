@@ -6,8 +6,10 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="var" path="pdfbox-2.0.9"/>
-	<classpathentry kind="var" path="fontbox-2.0.9"/>
-	<classpathentry kind="var" path="commons-logging-1.2"/>
+	<classpathentry kind="lib" path="/Users/franknaros/Downloads/pdfbox-2.0.9.jar" sourcepath="/Users/franknaros/Downloads/pdfbox-2.0.9-src.zip"/>
+	<classpathentry kind="lib" path="/Users/franknaros/Downloads/fontbox-2.0.9.jar"/>
+	<classpathentry kind="lib" path="/Users/franknaros/Downloads/pdfbox-tools-2.0.9.jar"/>
+	<classpathentry kind="lib" path="/Users/franknaros/Downloads/xmpbox-2.0.9.jar"/>
+	<classpathentry kind="lib" path="/Users/franknaros/Downloads/commons-logging-1.2/commons-logging-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
