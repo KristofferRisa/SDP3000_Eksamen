@@ -13,10 +13,21 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import org.apache.pdfbox.cos.COSBase;
+import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageTree;
+import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.graphics.pattern.PDAbstractPattern;
 import org.apache.pdfbox.text.PDFTextStripper;
 
 import controller.Controller;
+import logic.Visitor;
 
 public class Editorview extends JPanel implements DocumentListener {
 		
@@ -68,8 +79,46 @@ public class Editorview extends JPanel implements DocumentListener {
 			
 			doc = PDDocument.load(f);
             //content = new PDFTextStripper().getText(doc);
+			
+			Visitor visitor = new Visitor();
+	        
+	        PDDocument pdfDocument = PDDocument.load(file);
+	        
+	        PDPageTree allPages  = pdfDocument.getDocumentCatalog().getPages();
+			System.out.println(allPages.getCount() + " pages");
+	        
+	        for (PDPage p:allPages) {
+	        	COSDictionary dictionaryForThisPage = p.getCOSObject();
+	            for (COSName cd:dictionaryForThisPage.keySet()) {			
+	    	        try {
+	    	        	
+	    	        	COSBase theDictionaryObject = dictionaryForThisPage.getDictionaryObject(cd);
+	    	        	theDictionaryObject.accept(visitor);
+	    				
+	    			} catch (IOException e) {
+	    				// TODO Auto-generated catch block
+	    				e.printStackTrace();
+	    			}
+	    			
+	            }
+			}
+			
+			
+			for (int i = 0; i < doc.getNumberOfPages(); ++i)
+			{
+			    PDPage page = doc.getPage(i);
+			    PDResources res = page.getResources();
+			    for (COSName fontName : res.getFontNames())
+			    {
+			        PDFont font = res.getFont(fontName);
+			        // do stuff with the font
+			        System.out.println("Font: " + font.getFontDescriptor().getFontName());
+			    }
+			}
+			
             content = new PDFText2HTML().getText(doc);
                 
+
 		}
 		catch (IOException e) {
             System.out.println(e.getMessage());

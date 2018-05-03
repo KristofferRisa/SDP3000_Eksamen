@@ -65,6 +65,7 @@ public class ObjectInvestigator {
 //				System.out.println("pagesFromCatalog size = " + pagesFromCatalog.spliterator().getExactSizeIfKnown());
 				System.out.println(pdfDocument.getVersion());
 				pdfDocument.close();
+				
 			} catch (InvalidPasswordException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -100,7 +101,6 @@ public class ObjectInvestigator {
 		 int x = 0;
 		 int y = pageCount;
 		 
-		
 		 x = findSeveralOtherPageAccessors(p, pageCount, x, y);
 		 
 		for (COSName cd:dictionaryForThisPage.keySet()) {			

@@ -24,10 +24,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.pdfbox.cos.COSBase;
+import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.font.PDFontDescriptor;
+import org.apache.pdfbox.pdmodel.graphics.state.PDGraphicsState;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
+
+import logic.Visitor;
 
 /**
  * Wrap stripped text in simple HTML, trying to form HTML paragraphs. Paragraphs
@@ -52,18 +60,31 @@ public class PDFText2HTML extends PDFTextStripper
         
         setLineSeparator(LINE_SEPARATOR);
         
+        
+        
         //Finn farge
         String color = "";
         
         setParagraphStart("<p style=\"color:\""+color+">");
         setParagraphEnd("</p>"+ LINE_SEPARATOR);
         
+                
         setPageStart("<div style=\"page-break-before:always; page-break-after:always\">");
         
         setPageEnd("</div>"+ LINE_SEPARATOR);
         
         setArticleStart(LINE_SEPARATOR);
         setArticleEnd(LINE_SEPARATOR);
+    }
+    
+    @Override
+    protected void processTextPosition(TextPosition text) {
+        PDGraphicsState graphicsState = getGraphicsState();
+		System.out.println("R = " + graphicsState.getStrokingColor());
+//            System.out.println("G = " + graphicsState
+//            		.getNonStrokingColor().getJavaColor().getGreen());
+//            System.out.println("B = " + graphicsState.getNonStrokingColor().getJavaColor().getBlue());
+   
     }
 
     /**

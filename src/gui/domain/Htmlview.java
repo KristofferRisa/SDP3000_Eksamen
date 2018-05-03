@@ -7,6 +7,8 @@ import javax.swing.JScrollPane;
 
 public class Htmlview extends JPanel {
 
+	private static final long serialVersionUID = 1L;
+	
 	JLabel text = new JLabel();
 
 	public Htmlview() {		
