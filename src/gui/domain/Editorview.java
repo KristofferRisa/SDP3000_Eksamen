@@ -2,9 +2,11 @@ package gui.domain;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;
+import java.awt.List;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -61,6 +63,14 @@ public class Editorview extends JPanel implements DocumentListener {
 			FileOutputStream fo = new FileOutputStream(f);
 			fo.write(text.getText().getBytes());
 			fo.close();
+			java.util.List<String> images = converter.getImages();
+			for(String img : images)
+			{
+				File a = new File(img);
+				String path = f.getParent() + "\\" + a.getName();
+				a.renameTo(new File(path));
+				a.delete();
+			}
 			isConverted = true;
 			
 		} catch (Exception e) {}				
