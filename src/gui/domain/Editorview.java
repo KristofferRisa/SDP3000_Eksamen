@@ -73,9 +73,9 @@ public class Editorview extends JPanel implements DocumentListener {
 //            content = new PDFText2HTML().getText(doc);
 //			content = new PdfToHtmlConverter().getText(doc);
 
-		String filenameoutput = "test.html";
+		String htmlFilnavn = f.getName().replaceAll(".pdf", ".html");
 		try {
-			ConvertPdfToHtmlFile htmlFile = new ConvertPdfToHtmlFile(filenameoutput, 1, 1);
+			ConvertPdfToHtmlFile htmlFile = new ConvertPdfToHtmlFile(htmlFilnavn, 1, 1);
 			htmlFile.convertPdfToHtml(f.getName());
 			htmlFile.closeFile();
 			
@@ -84,10 +84,9 @@ public class Editorview extends JPanel implements DocumentListener {
 			e.printStackTrace();
 		}
 		
-		f = new File(filenameoutput);
 		if(f.exists() && !f.isDirectory()) { 
 			try {
-		        BufferedReader in = new BufferedReader(new FileReader(filenameoutput));
+		        BufferedReader in = new BufferedReader(new FileReader(htmlFilnavn));
 		        String str;
 		        while ((str = in.readLine()) != null) {
 		            content +=str;

@@ -30,16 +30,10 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
 	
 	private BufferedWriter htmlFile;
 	
-	private int type = 0;
-	
-	private float zoom = (float) 2;
-	
 	private int marginTopBackground = 0;
 
 	private int lastMarginTop = 0;
-	
-	private int max_gap = 15;
-	
+		
 	float previousAveCharWidth = -1;
     private int resolution = 72; //default resolution
 
@@ -75,31 +69,25 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
 			htmlFile = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileName),"UTF8"));
 			String header =
 					"<html>" +
-					"<head>" +
-//					"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>" +
+					"<head> \r\n" +
 					"<title>Html file</title>" +
 					"<link rel=\"stylesheet\" href=\"css/style.css\" />" +
 					"</head>" +
 					"<body>";
 			htmlFile.write(header);
-			this.type = type;
-			this.zoom= zoom;
 			
 		}
     	catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
             System.err.println( "Error: Unsupported encoding." );
-            System.exit( 1 );
 		}
     	catch (FileNotFoundException e) {
 			e.printStackTrace();
             System.err.println( "Error: File not found." );
-            System.exit( 1 );
 		}
     	catch (IOException e) {
 			e.printStackTrace();
             System.err.println( "Error: IO error, could not open html file." );
-            System.exit( 1 );
 		}
 	}
 	
@@ -115,7 +103,6 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
 		} catch (IOException e) {
 			e.printStackTrace();
             System.err.println( "Error: IO error, could not close html file." );
-            System.exit( 1 );
 		}
 	}
 	
@@ -132,7 +119,6 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
 		int positionDotPdf = pathToPdf.lastIndexOf(".pdf");
 		if (positionDotPdf == -1) {
             System.err.println("File doesn't have .pdf extension");
-            System.exit(1);
 		}
 		int positionLastSlash = pathToPdf.lastIndexOf("/");
 		if (positionLastSlash  == -1) {
@@ -148,9 +134,6 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
         try {
         	document = PDDocument.load(pathToPdf);
 
-            if(document.isEncrypted()){
-            	document.decrypt( "" );
-            }
             List allPages = document.getDocumentCatalog().getAllPages();
             
             // Retrieve and save text in the HTML file
@@ -159,25 +142,24 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
             	PDPage page = (PDPage)allPages.get(i);
 
             	BufferedImage image = page.convertToImage(BufferedImage.TYPE_INT_RGB, resolution);
-
-            	
-//            	 URI filbane = Paths.get("").toUri();
-//            	
-//            	 File Uribane = Paths.get(filbane).toFile();
             	
         		htmlFile.write( 
-        				"<div class=\"background\" style=\"position: absolute; width: "+zoom*image.getWidth()
-        				+ "; height: "+zoom*image.getHeight() 
-        				+ "; background: url('file:" +  fileName+(int)(i+1)+".png') top left no-repeat; margin-top: "+ marginTopBackground 
+        				"<div class=\"background\" style=\"position: absolute; width: " + image.getWidth()
+        				+ "; height: " + image.getHeight() 
+        				+ "; background: url('file:" +  fileName+(int)(i+1)+".png') "
+        				+ "top left no-repeat; margin-top: "+ marginTopBackground 
         				+ "\">");
-        		marginTopBackground += zoom*image.getHeight();
+        		htmlFile.newLine();
+        		marginTopBackground += image.getHeight();
             	PDStream contents = page.getContents();
             	if( contents != null ) {
             		this.processStream( page, page.findResources(), page.getContents().getStream() );
             	}
 
             	htmlFile.write("</span>");
+            	htmlFile.newLine();
             	htmlFile.write( "</div>");
+            	htmlFile.newLine();
             	
             }
             
@@ -224,7 +206,7 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
             
 
             boolean success = imageWriter.writeImage(document, imageFormat, password,
-                    startPage, endPage, outputPrefix, imageType, (int) (resolution*zoom));
+                    startPage, endPage, outputPrefix, imageType, (int) (resolution));
             if (!success)
             {
                 System.err.println( "Error: no writer found for image format '"
@@ -238,8 +220,6 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
                 document.close();
             }
         }
-
-
 	}
 	
     /**
@@ -253,9 +233,9 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
     	try {
     		
 
-       		int marginLeft = (int)((text.getXDirAdj())*zoom);
-    		int fontSizePx = Math.round(text.getFontSizeInPt()/72*resolution*zoom);
-    		int marginTop = (int)((text.getYDirAdj())*zoom-fontSizePx);
+       		int marginLeft = (int)((text.getXDirAdj()));
+    		int fontSizePx = Math.round(text.getFontSizeInPt()/ 72 * resolution );
+    		int marginTop = (int)((text.getYDirAdj()) - fontSizePx);
 
 
     		String fontString = "";
@@ -284,26 +264,14 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
     		if (indexComa != -1) {
     			fontString = fontString.substring(0, indexComa);
     		}
-
-    		switch (type){
-    			case 0:
-    	    		renderingSimple(text, marginLeft,  marginTop, fontSizePx, fontString, isBold, isItalic);
-    	    		break;
-    			case 1:
-    				renderingGroupByWord(text, marginLeft,  marginTop, fontSizePx, fontString, isBold, isItalic);
-    	    		break;
-    			case 2:
-    				renderingGroupByLineNoCache(text, marginLeft,  marginTop, fontSizePx, fontString, isBold, isItalic);
-    	    		break;
-    			case 3:
-    				renderingGroupByLineWithCache(text, marginLeft,  marginTop, fontSizePx, fontString, isBold, isItalic);
-    	    		break;
-                default:
-                	renderingSimple(text, marginLeft,  marginTop, fontSizePx, fontString, isBold, isItalic);
-                	break;
-
-    		}
-
+    	
+        	renderingSimple(text, marginLeft,  marginTop, fontSizePx, fontString, isBold, isItalic);
+            
+//    				renderingSimple(text, marginLeft,  marginTop, fontSizePx, fontString, isBold, isItalic); //0
+//    				renderingGroupByWord(text, marginLeft,  marginTop, fontSizePx, fontString, isBold, isItalic); // 1
+//    				renderingGroupByLineNoCache(text, marginLeft,  marginTop, fontSizePx, fontString, isBold, isItalic); //2
+//    				renderingGroupByLineWithCache(text, marginLeft,  marginTop, fontSizePx, fontString, isBold, isItalic); //3
+    	
     	    
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -333,271 +301,13 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
 			htmlFile.write("font-style: italic;");
 		}
 		htmlFile.write("\">");
+		htmlFile.newLine();
 	
 		htmlFile.write(text.getCharacter());
 
 		htmlFile.write("</span>"); 
+		htmlFile.newLine();
     }
-    
-    
-    /** 
-     * The method that given one character is going to write it only if it's the end of a word in the HTML file.
-     * 
-     * @param text
-     * @param marginLeft
-     * @param marginTop
-     * @param fontSizePx
-     * @param fontString
-     * @param isBold
-     * @param isItalic
-     * @throws IOException 
-
-     */
-    private void renderingGroupByWord(TextPosition text, int marginLeft, int marginTop, int fontSizePx, String fontString, boolean isBold, boolean isItalic) throws IOException {
-    	if (lastMarginTop == marginTop) {
-   			if ((needToStartNewSpan) || (wasBold != isBold) || (wasItalic != isItalic) || (lastFontSizePx != fontSizePx) || (lastMarginLeft>marginLeft) || (marginLeft-lastMarginRight>max_gap)){
-    			if (lastMarginTop != 0) {
-    				htmlFile.write("</span>");
-    			}
-
-    			htmlFile.write("<span style=\"position: absolute; margin-left:"+marginLeft+"px; margin-top: "+marginTop+"px; font-size: "+fontSizePx+"px; font-family:"+fontString+";");
-        		if (isBold) {
-        			htmlFile.write("font-weight: bold;");
-        		}
-        		if (isItalic) {
-        			htmlFile.write("font-style: italic;");
-        		}
-    			htmlFile.write("\">");
-    			
-    			needToStartNewSpan = false;
-   			}
-   			
-   			if (text.getCharacter().equals(" ")){
-    			htmlFile.write(" ");
-    			
-    			needToStartNewSpan = true;
-			}
-			else {
-				htmlFile.write(text.getCharacter().replace("<", "&lt;").replace(">", "&gt;"));
-			}	
-   			
-		}
-		else {
-			if (text.getCharacter().equals(" ")) {
-				htmlFile.write("&nbsp;");   
-    			needToStartNewSpan = true;
-			}
-			else {
-    			needToStartNewSpan = false;
-
-    			if (lastMarginTop != 0) {
-    				htmlFile.write("</span>");
-    			}
-    			
-        		htmlFile.write("<span style=\"position: absolute; margin-left:"+marginLeft+"px; margin-top: "+marginTop+"px; font-size: "+fontSizePx+"px; font-family:"+fontString+";");
-        		if (isBold) {
-        			htmlFile.write("font-weight: bold;");
-        		}
-        		if (isItalic) {
-        			htmlFile.write("font-style: italic;");
-        		}
-    			htmlFile.write("\">");
-    			
-    			htmlFile.write(text.getCharacter().replace("<", "&lt;").replace(">", "&gt;"));    			
-    		}
-			
-			lastMarginTop = marginTop;
-		}
-   		lastMarginLeft = marginLeft;
-   		lastMarginRight = (int) (marginLeft + text.getWidth());
-
-		wasBold = isBold;
-		wasItalic = isItalic;
-		lastFontSizePx = fontSizePx;
-		
-	}
-   
-    /** 
-     * The method that given one character is going to write it only if it's the end of a line in the HTML file.
-     * 
-     * @param text
-     * @param marginLeft
-     * @param marginTop
-     * @param fontSizePx
-     * @param fontString
-     * @param isBold
-     * @param isItalic
-     * @throws IOException 
-
-     */
-    private void renderingGroupByLineNoCache(TextPosition text, int marginLeft, int marginTop, int fontSizePx, String fontString, boolean isBold, boolean isItalic) throws IOException {
-		if (lastMarginTop == marginTop) {
-   			if (lastMarginLeft>marginLeft) {
-    			htmlFile.write("</span>");
-            	htmlFile.write("<span style=\"position: absolute; margin-left:"+marginLeft+"px; margin-top: "+marginTop+"px; font-size: "+fontSizePx+"px; font-family:"+fontString+";");
-           		if (isBold) {
-           			htmlFile.write("font-weight: bold;");
-           		}
-           		if (isItalic) {
-           			htmlFile.write("font-style: italic;");
-           		}
-       			htmlFile.write("\">");
-       		}
-       		lastMarginTop = marginTop;
-
-		}
-		else {
-			if (lastMarginTop != 0) {
-				htmlFile.write("</span>");
-			}
-			
-    		htmlFile.write("<span style=\"position: absolute; margin-left:"+marginLeft+"px; margin-top: "+marginTop+"px; font-size: "+fontSizePx+"px; font-family:"+fontString+";");
-    		if (isBold) {
-    			htmlFile.write("font-weight: bold;");
-    		}
-    		if (isItalic) {
-    			htmlFile.write("font-style: italic;");
-    		}
-			htmlFile.write("\">");
-
-			lastMarginTop = marginTop;
-		}
-		
-		htmlFile.write(text.getCharacter().replace("<", "&lt;").replace(">", "&gt;"));
-   		lastMarginLeft = marginLeft;
-	}	
-
-    /** 
-     * The method that given one character is going to write it only if it's the end of a line in the HTML file.
-     * A cache is used to set the word-spacing property.
-     * 
-     * @param text
-     * @param marginLeft
-     * @param marginTop
-     * @param fontSizePx
-     * @param fontString
-     * @param isBold
-     * @param isItalic
-     * @throws IOException 
-
-     */
-    private void renderingGroupByLineWithCache(TextPosition text, int marginLeft, int marginTop, int fontSizePx, String fontString, boolean isBold, boolean isItalic) throws IOException {
-    	if (marginLeft-lastMarginRight> text.getWidthOfSpace()) {
-    		currentLine.append(" ");
-    		
-			sizeAllSpace += (marginLeft-lastMarginRight);
-			numberSpace++;
-			addSpace = false;
-
-    	}
-    	if ((lastMarginTop != marginTop) || (!lastFontString.equals(fontString)) || (wasBold != isBold) || (wasItalic != isItalic) || (lastFontSizePx != fontSizePx) || (lastMarginLeft>marginLeft) || (marginLeft-lastMarginRight>150)){
-			if (lastMarginTop != 0) {
-				boolean display = true;
-				
-				// if the bloc is empty, we do not display it (for a lighter result)
-				if (currentLine.length() == 1) {
-					char firstChar = currentLine.charAt(0);
-					if (firstChar == ' ') {
-						display = false;
-					}
-				}
-				if (display) {
-       				if (numberSpace != 0) {
-       					int spaceWidth = Math.round(((float) sizeAllSpace)/((float) numberSpace)-text.getWidthOfSpace());
-                		htmlFile.write("<span style=\"word-spacing:"+spaceWidth+"px;position: absolute; margin-left:"+startXLine+"px; margin-top: "+lastMarginTop+"px; font-size: "+lastFontSizePx+"px; font-family:"+lastFontString+";");
-        			}
-        			else {
-                		htmlFile.write("<span style=\"position: absolute; margin-left:"+startXLine+"px; margin-top: "+lastMarginTop+"px; font-size: "+lastFontSizePx+"px; font-family:"+lastFontString+";");
-        			}
-
-       				if (wasBold) {
-            			htmlFile.write("font-weight: bold;");
-            		}
-            		if (wasItalic) {
-            			htmlFile.write("font-style: italic;");
-            		}
-        			htmlFile.write("\">");
-    			        			
-    				htmlFile.write(currentLine.toString());
-
-        			htmlFile.write("</span>\n");
-					
-				}
-			}
-   			numberSpace = 0;
-   			sizeAllSpace = 0;
-
-    		currentLine = new StringBuffer();
-    		startXLine = marginLeft;
-    		lastMarginTop = marginTop;
-   			wasBold = isBold;
-   			wasItalic = isItalic;
-   			lastFontSizePx = fontSizePx;
-   			lastFontString = fontString;
-   			
-   			addSpace = false;
-		}
-		else {
-			int sizeCurrentSpace = (int) (marginLeft-lastMarginRight-text.getWidthOfSpace());
-   			if (sizeCurrentSpace > 5) {
-    			if (lastMarginTop != 0) {
-       				if (numberSpace != 0) {
-       					int spaceWidth = Math.round(((float) sizeAllSpace)/((float) numberSpace)-text.getWidthOfSpace());
-                		htmlFile.write("<span style=\"word-spacing:"+spaceWidth+"px;position: absolute; margin-left:"+startXLine+"px; margin-top: "+lastMarginTop+"px; font-size: "+lastFontSizePx+"px; font-family:"+lastFontString+";");
-        			}
-        			else {
-                		htmlFile.write("<span style=\"position: absolute; margin-left:"+startXLine+"px; margin-top: "+lastMarginTop+"px; font-size: "+lastFontSizePx+"px; font-family:"+lastFontString+";");
-        			}
-
-       				if (wasBold) {
-            			htmlFile.write("font-weight: bold;");
-            		}
-            		if (wasItalic) {
-            			htmlFile.write("font-style: italic;");
-            		}
-        			htmlFile.write("\">");
-    			
-    				htmlFile.write(currentLine.toString());
-
-        			htmlFile.write("</span>\n");
-    			}
-       			numberSpace = 0;
-       			sizeAllSpace = 0;
-
-        		currentLine = new StringBuffer();
-        		startXLine = marginLeft;
-        		lastMarginTop = marginTop;
-       			wasBold = isBold;
-       			wasItalic = isItalic;
-       			lastFontSizePx = fontSizePx;
-       			lastFontString = fontString;
-       			
-	   			addSpace = false;
-
-    		}
-   			else {
-   	   			if (addSpace) {
-   	        		currentLine.append(" ");
-
-   	   				sizeAllSpace += (marginLeft-lastMarginRight);
-   	   				numberSpace++;
-   	   				addSpace = false;
-   	   			}
-
-   			}
-			}
-
-			
-   		if (text.getCharacter().equals(" ")) {
-			addSpace = true;
-			//sizeAllSpace += text.getWidthOfSpace();
-   		}
-   		else {
-	       	currentLine.append(text.getCharacter().replace("<", "&lt;").replace(">", "&gt;"));
-   		}
-			lastMarginLeft = marginLeft;
-			lastMarginRight = (int) (marginLeft + text.getWidth()*zoom);
-	}
     
     
         
