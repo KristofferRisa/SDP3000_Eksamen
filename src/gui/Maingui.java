@@ -32,7 +32,6 @@ public class Maingui extends JFrame {
 		setVisible(true);
 		
 		setDividers();
-		
 	}
 
 	private void setDividers() {

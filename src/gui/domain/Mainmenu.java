@@ -25,6 +25,7 @@ public class Mainmenu extends JMenuBar implements ActionListener {
 	JMenuItem exit = new JMenuItem("exit");
 	JMenuItem paste = new JMenuItem("paste");
 	JMenuItem test = new JMenuItem("test");
+	JMenuItem view = new JMenuItem("vis i nettleser");
 
 	JCheckBoxMenuItem toggleAutoForHtmlRendering = new JCheckBoxMenuItem("Vis HTML",false);
 	
@@ -46,15 +47,14 @@ public class Mainmenu extends JMenuBar implements ActionListener {
 		// edit
 		edit.add(paste).addActionListener(this);
 		
-
 		// tools
 		tools.add(test).addActionListener(this);
 		tools.add(toggleAutoForHtmlRendering).addActionListener(this);
-
+		tools.add(view).addActionListener(this);
+		
 		// windows
 
 		// help
-
 		add(file);
 		add(edit);
 		add(tools);
@@ -78,6 +78,8 @@ public class Mainmenu extends JMenuBar implements ActionListener {
 			Controller.testhtml();
 		if(arg.getSource() == toggleAutoForHtmlRendering)
 			toggleHtmlView();
+		if(arg.getSource() == view)
+			Controller.se();
 	}
 
 	private void toggleHtmlView() {

@@ -69,7 +69,6 @@ public class Editorview extends JPanel implements DocumentListener {
 				File a = new File(img);
 				String path = f.getParent() + "\\" + a.getName();
 				a.renameTo(new File(path));
-				a.delete();
 			}
 			isConverted = true;
 			

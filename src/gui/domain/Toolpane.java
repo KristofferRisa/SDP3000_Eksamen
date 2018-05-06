@@ -1,5 +1,6 @@
 package gui.domain;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -13,14 +14,20 @@ import controller.Controller;
 public class Toolpane extends JPanel implements ActionListener {
 	
 	private static final long serialVersionUID = -7579333997356940204L;
-	JButton open = new JButton("Åpne",new ImageIcon("load.png"));
-	JButton se = new JButton("Se i nettleser",new ImageIcon("load.png"));
-	JButton save = new JButton("Eksporter",new ImageIcon("save.png"));
-	JButton exit = new JButton("Avslutt",new ImageIcon("exit.png"));
+	
+	JButton open = new JButton("| Åpne |");
+	JButton se = new JButton("| Se i nettleser |");
+	JButton save = new JButton("| Eksporter |");
+	JButton exit = new JButton("| Avslutt |");
 	
 	JToolBar toolbar = new JToolBar(); 
 	
 	public Toolpane() {
+		open.getPreferredSize();
+		se.getPreferredSize();
+		save.getPreferredSize();
+		exit.getPreferredSize();
+		
 		((JButton)toolbar.add(open)).addActionListener(this);
 		((JButton)toolbar.add(save)).addActionListener(this);
 		((JButton)toolbar.add(se)).addActionListener(this);
