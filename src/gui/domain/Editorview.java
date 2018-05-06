@@ -75,7 +75,7 @@ public class Editorview extends JPanel implements DocumentListener {
 
 		String filenameoutput = "test.html";
 		try {
-			HtmlFile htmlFile = new HtmlFile(filenameoutput, 1, 1);
+			ConvertPdfToHtmlFile htmlFile = new ConvertPdfToHtmlFile(filenameoutput, 1, 1);
 			htmlFile.convertPdfToHtml(f.getName());
 			htmlFile.closeFile();
 			

@@ -1,7 +1,5 @@
 package gui.domain;
 
-
-
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -28,15 +26,18 @@ import org.apache.pdfbox.util.PDFOperator;
 import org.apache.pdfbox.util.PDFTextStripper;
 import org.apache.pdfbox.util.TextPosition;
 
-public class HtmlFile extends PDFTextStripper{
+public class ConvertPdfToHtmlFile extends PDFTextStripper{
+	
 	private BufferedWriter htmlFile;
 	
 	private int type = 0;
+	
 	private float zoom = (float) 2;
 	
 	private int marginTopBackground = 0;
 
 	private int lastMarginTop = 0;
+	
 	private int max_gap = 15;
 	
 	float previousAveCharWidth = -1;
@@ -69,7 +70,7 @@ public class HtmlFile extends PDFTextStripper{
     * @param zoom 1.5 - 2 is a good range
     * @throws IOException
     */
-    public HtmlFile(String outputFileName, int type, float zoom) throws IOException{
+    public ConvertPdfToHtmlFile(String outputFileName, int type, float zoom) throws IOException{
     	try {
 			htmlFile = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileName),"UTF8"));
 			String header =
