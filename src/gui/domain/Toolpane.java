@@ -14,7 +14,7 @@ public class Toolpane extends JPanel implements ActionListener {
 	
 	JButton open = new JButton("Åpne",new ImageIcon("load.png"));
 	JButton se = new JButton("Se i nettleser",new ImageIcon("load.png"));
-	JButton save = new JButton("Lagre",new ImageIcon("save.png"));
+	JButton save = new JButton("Eksporter",new ImageIcon("save.png"));
 	JButton exit = new JButton("Avslutt",new ImageIcon("exit.png"));
 	
 	JToolBar toolbar = new JToolBar(); 
@@ -22,8 +22,8 @@ public class Toolpane extends JPanel implements ActionListener {
 	public Toolpane() {
 		((JButton)toolbar.add(open)).addActionListener(this);
 		((JButton)toolbar.add(save)).addActionListener(this);
-		((JButton)toolbar.add(exit)).addActionListener(this);
 		((JButton)toolbar.add(se)).addActionListener(this);
+		((JButton)toolbar.add(exit)).addActionListener(this);
 		add(toolbar);
 	}
 	

@@ -2,15 +2,12 @@ package gui.domain;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -18,20 +15,23 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-
-
 import controller.Controller;
 
 public class Editorview extends JPanel implements DocumentListener {
 		
+	private static final long serialVersionUID = 1398799947820949273L;
+
 	JTextArea text = new JTextArea();
 	
 	File file = new File (".");
 	
 	JFileChooser jf = new JFileChooser(file);
+
+	boolean isConverted;
 	
 	public Editorview() {
+		
+		isConverted = false;
 		
 		FileNameExtensionFilter pdfFilter = new FileNameExtensionFilter("PDF Files", "pdf");
 		jf.setFileFilter(pdfFilter);
@@ -43,11 +43,15 @@ public class Editorview extends JPanel implements DocumentListener {
 	}
 	
 	public void save() {
+		FileNameExtensionFilter htmlFilter = new FileNameExtensionFilter("HTML Files", "html", "htm", "xhtml");
+
+		jf.setSelectedFile(new File(file.getName().replaceAll(".pdf", ".html")));
 		
-		jf.setApproveButtonText("Lagre tekstfil");
+		jf.setFileFilter(htmlFilter);
+		jf.setApproveButtonText("Eksporter HTML");
 		jf.setCurrentDirectory(file);
-		jf.showSaveDialog(null);		
-		
+		jf.showSaveDialog(null);
+
 		if ((file = jf.getSelectedFile())!=null) {
 			saveTo(file);
 		}
@@ -60,6 +64,7 @@ public class Editorview extends JPanel implements DocumentListener {
 			FileOutputStream fo = new FileOutputStream(f);
 			fo.write(text.getText().getBytes());
 			fo.close();
+			isConverted = true;
 			
 		} catch (Exception e) {}				
 	}
@@ -72,6 +77,7 @@ public class Editorview extends JPanel implements DocumentListener {
 		
 		if ((file = jf.getSelectedFile())!=null) {			
 			text.setText(loadFrom(file));
+			isConverted = false;
 		}
 	}
 	
@@ -83,32 +89,18 @@ public class Editorview extends JPanel implements DocumentListener {
 		
 		System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
 
-		try {
+		try 
+		{
+			PdfToHtmlConverter converter = new PdfToHtmlConverter(f);
+			converter.convertPdfToHtml();
 			
-			ConvertPdfToHtmlFile htmlFile = new ConvertPdfToHtmlFile(f);
-			htmlFile.convertPdfToHtml(f.getName());
-			htmlFile.closeFile();
+			return converter.getText();
 			
-		} catch (Exception e) {
-		    System.err.println( "Filed to convert Pdf to Html." );
+		} catch (IOException e) 
+		{
 			e.printStackTrace();
+			return null;
 		}
-		
-		String content = "";
-		if(f.exists() && !f.isDirectory()) { 
-			try {
-				String htmlFilnavn = f.getName().replaceAll(".pdf", ".html");
-		        BufferedReader in = new BufferedReader(new FileReader(htmlFilnavn));
-		        String str;
-		        while ((str = in.readLine()) != null) {
-		            content +=str;
-		        }
-		        in.close();
-		    	} catch (IOException e) {
-		    }
-		}
-		
-		return content;
 	}
 
 	public void paste() {		
@@ -129,6 +121,16 @@ public class Editorview extends JPanel implements DocumentListener {
 	}
 
 	public void se() {
+		if(!isConverted) {
+			int dialogResult = JOptionPane.showConfirmDialog (
+					null
+					, "HTML koden er ikke eksportert, ønsker du å eksportere nå?"
+					,"Question"
+					,JOptionPane.YES_NO_CANCEL_OPTION);
+			if(dialogResult == JOptionPane.YES_OPTION){
+			  Controller.save();
+			}
+		} 
 		if(file != null)
 		{
 			try {
@@ -137,6 +139,7 @@ public class Editorview extends JPanel implements DocumentListener {
 				e.printStackTrace();
 			}
 		}
+		
 	}
 		
 }

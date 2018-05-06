@@ -5,11 +5,16 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-public class Domainview extends JPanel {
+public class Domainview extends JPanel 
+{
 
 	Editorview editorview;
+	
 	Htmlview htmlview;
+	
 	JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+
+	private static final long serialVersionUID = -2322895033437159122L;
 	
 	public Domainview() {
 		setLayout(new BorderLayout());

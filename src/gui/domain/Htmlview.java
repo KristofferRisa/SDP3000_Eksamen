@@ -3,14 +3,12 @@ package gui.domain;
 import java.awt.BorderLayout;
 
 import javax.swing.JEditorPane;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 public class Htmlview extends JPanel {
 
-//	JLabel text = new JLabel();
-	
+	private static final long serialVersionUID = 1339234431645166967L;
 	JEditorPane text;
 	
 	public Htmlview() {		

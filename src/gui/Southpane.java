@@ -1,15 +1,15 @@
 package gui;
 
-import gui.domain.Commandpane;
-
 import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
 
+import gui.domain.Toolpane;
+
 public class Southpane extends JPanel {
 	
 	public Southpane() {
-		add(new Commandpane(),BorderLayout.SOUTH);
+		add(new Toolpane(),BorderLayout.SOUTH);
 	}
 
 }

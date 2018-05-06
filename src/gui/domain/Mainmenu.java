@@ -18,13 +18,15 @@ import controller.Controller;
 
 public class Mainmenu extends JMenuBar implements ActionListener {
 
-	// list of global menuitems, accessible in several methods
+	private static final long serialVersionUID = -3090867748585220252L;
+
 	JMenuItem open = new JMenuItem("load");
 	JMenuItem save = new JMenuItem("save");
 	JMenuItem exit = new JMenuItem("exit");
 	JMenuItem paste = new JMenuItem("paste");
 	JMenuItem test = new JMenuItem("test");
-	JCheckBoxMenuItem toggleAutoForHtmlRendering = new JCheckBoxMenuItem("Vis HTML",true);
+
+	JCheckBoxMenuItem toggleAutoForHtmlRendering = new JCheckBoxMenuItem("Vis HTML",false);
 	
 	public Mainmenu() {
 		// list of verticals
