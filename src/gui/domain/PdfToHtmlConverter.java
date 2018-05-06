@@ -47,7 +47,8 @@ public class PdfToHtmlConverter extends PDFTextStripper {
         	doc = PDDocument.load(file);
         	List<PDPage> alleSider = doc.getDocumentCatalog().getAllPages();
             
-            for( int i=0; i<alleSider.size(); i++ ) {
+            for( int i=0; i<alleSider.size(); i++ ) 
+            {
             	
             	PDPage pdSide = alleSider.get(i);
             	BufferedImage img = pdSide.convertToImage(BufferedImage.TYPE_INT_RGB, resolution);
@@ -76,7 +77,8 @@ public class PdfToHtmlConverter extends PDFTextStripper {
             	html.append("</body> \n</html>");
             }
             
-            for( int i=0; i<alleSider.size(); i++ ) {
+            for( int i=0; i<alleSider.size(); i++ ) 
+            {
                 
             	PDPage page = alleSider.get( i );
                 
@@ -103,6 +105,7 @@ public class PdfToHtmlConverter extends PDFTextStripper {
             		, file.getName()
             		, BufferedImage.TYPE_INT_RGB
             		, (int) (resolution));
+            
             if (!success)
             {
                 System.err.println("Feilet ved skriving av image");

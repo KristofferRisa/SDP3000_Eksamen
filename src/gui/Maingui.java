@@ -10,6 +10,7 @@ import controller.Controller;
 
 public class Maingui extends JFrame {
 
+	private static final long serialVersionUID = -7492008103768786973L;
 	Centerpane centerpane;
 	Northpane northpane;
 	Southpane southpane;

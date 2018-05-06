@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 
 public class Centerpane extends JPanel  {	
 		
+	private static final long serialVersionUID = 9132226629945729293L;
 	Domainview domainview;	
 	
 	public Centerpane() {

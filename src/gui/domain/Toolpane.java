@@ -12,6 +12,7 @@ import controller.Controller;
 
 public class Toolpane extends JPanel implements ActionListener {
 	
+	private static final long serialVersionUID = -7579333997356940204L;
 	JButton open = new JButton("Åpne",new ImageIcon("load.png"));
 	JButton se = new JButton("Se i nettleser",new ImageIcon("load.png"));
 	JButton save = new JButton("Eksporter",new ImageIcon("save.png"));

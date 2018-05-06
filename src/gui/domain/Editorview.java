@@ -28,13 +28,10 @@ public class Editorview extends JPanel implements DocumentListener {
 	JFileChooser jf = new JFileChooser(file);
 
 	boolean isConverted;
+
+	private PdfToHtmlConverter converter;
 	
 	public Editorview() {
-		
-		isConverted = false;
-		
-		FileNameExtensionFilter pdfFilter = new FileNameExtensionFilter("PDF Files", "pdf");
-		jf.setFileFilter(pdfFilter);
 		
 		setLayout(new BorderLayout());
 		add(new JScrollPane(text));
@@ -71,6 +68,11 @@ public class Editorview extends JPanel implements DocumentListener {
 
 	public void load() {
 		
+		isConverted = false;
+		
+		FileNameExtensionFilter pdfFilter = new FileNameExtensionFilter("PDF Files", "pdf");
+		
+		jf.setFileFilter(pdfFilter);
 		jf.setApproveButtonText("Velg tekstfil");
 		jf.setCurrentDirectory(file);
 		jf.showOpenDialog(null);
@@ -91,7 +93,7 @@ public class Editorview extends JPanel implements DocumentListener {
 
 		try 
 		{
-			PdfToHtmlConverter converter = new PdfToHtmlConverter(f);
+			converter = new PdfToHtmlConverter(f);
 			converter.convertPdfToHtml();
 			
 			return converter.getText();
