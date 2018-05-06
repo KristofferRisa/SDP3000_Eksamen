@@ -34,4 +34,9 @@ public class Controller {
 		maingui.toggleHtmlView(toggle);
 	}
 
+	public static void se() {
+		maingui.se();
+		
+	}
+
 }

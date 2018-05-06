@@ -1,6 +1,7 @@
 package gui.domain;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -114,6 +115,19 @@ public class Editorview extends JPanel implements DocumentListener {
 
 	public void changedUpdate(DocumentEvent arg0) {
 		Controller.testhtml();		
+	}
+
+	public void se() {
+		if(file != null)
+		{
+			try {
+				Desktop.getDesktop().browse(file.toURI());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+			
+		
 	}
 		
 }

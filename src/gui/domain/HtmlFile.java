@@ -4,11 +4,15 @@ package gui.domain;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -153,11 +157,18 @@ public class HtmlFile extends PDFTextStripper{
             	System.out.println("Processing page "+i);
             	PDPage page = (PDPage)allPages.get(i);
 
-            	
-            	
             	BufferedImage image = page.convertToImage(BufferedImage.TYPE_INT_RGB, resolution);
 
-        		htmlFile.write( "<div class=\"background\" style=\"position: absolute; width: "+zoom*image.getWidth()+"; height: "+zoom*image.getHeight()+"; background: url('"+fileName+(int)(i+1)+".png') top left no-repeat; margin-top: "+marginTopBackground+"\">");
+            	
+//            	 URI filbane = Paths.get("").toUri();
+//            	
+//            	 File Uribane = Paths.get(filbane).toFile();
+            	
+        		htmlFile.write( 
+        				"<div class=\"background\" style=\"position: absolute; width: "+zoom*image.getWidth()
+        				+ "; height: "+zoom*image.getHeight() 
+        				+ "; background: url('file:" +  fileName+(int)(i+1)+".png') top left no-repeat; margin-top: "+ marginTopBackground 
+        				+ "\">");
         		marginTopBackground += zoom*image.getHeight();
             	PDStream contents = page.getContents();
             	if( contents != null ) {
@@ -182,7 +193,8 @@ public class HtmlFile extends PDFTextStripper{
                     if( token instanceof PDFOperator )
                     {
                         PDFOperator op = (PDFOperator)token;
-                        if( op.getOperation().equals( "TJ") || op.getOperation().equals( "Tj" ))
+                        if( op.getOperation().equals( "TJ") 
+                        		|| op.getOperation().equals( "Tj" ))
                         {
                             newTokens.remove( newTokens.size() -1 );
                             continue;

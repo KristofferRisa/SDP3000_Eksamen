@@ -41,6 +41,11 @@ public class Centerpane extends JPanel  {
 	public void toggleHtmlView(boolean toggle) {
 		domainview.toggleHtmlView(toggle);
 	}
+
+	public void se() {
+		domainview.se();
+		
+	}
 	
 
 }

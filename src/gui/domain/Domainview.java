@@ -43,4 +43,9 @@ public class Domainview extends JPanel {
 		setDividers();
 	}
 
+	public void se() {
+		editorview.se();
+		
+	}
+
 }

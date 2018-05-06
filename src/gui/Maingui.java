@@ -57,6 +57,10 @@ public class Maingui extends JFrame {
 	public void toggleHtmlView(boolean toggle) {
 		centerpane.toggleHtmlView(toggle);
 	}
+
+	public void se() {
+		centerpane.se();
+	}
 	
 	
 }

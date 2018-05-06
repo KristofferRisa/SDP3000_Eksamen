@@ -12,7 +12,8 @@ import controller.Controller;
 
 public class Toolpane extends JPanel implements ActionListener {
 	
-	JButton open = new JButton("ï¿½pne",new ImageIcon("load.png"));
+	JButton open = new JButton("Åpne",new ImageIcon("load.png"));
+	JButton se = new JButton("Se i nettleser",new ImageIcon("load.png"));
 	JButton save = new JButton("Lagre",new ImageIcon("save.png"));
 	JButton exit = new JButton("Avslutt",new ImageIcon("exit.png"));
 	
@@ -22,6 +23,7 @@ public class Toolpane extends JPanel implements ActionListener {
 		((JButton)toolbar.add(open)).addActionListener(this);
 		((JButton)toolbar.add(save)).addActionListener(this);
 		((JButton)toolbar.add(exit)).addActionListener(this);
+		((JButton)toolbar.add(se)).addActionListener(this);
 		add(toolbar);
 	}
 	
@@ -29,6 +31,7 @@ public class Toolpane extends JPanel implements ActionListener {
 		if (arg.getSource()==open) Controller.open();
 		if (arg.getSource()==save) Controller.save();
 		if (arg.getSource()==exit) Controller.stop();
+		if(arg.getSource() == se) Controller.se();
 	}
 	
 	
