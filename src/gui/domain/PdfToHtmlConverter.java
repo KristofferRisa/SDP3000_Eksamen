@@ -11,8 +11,10 @@ import org.apache.pdfbox.pdfwriter.ContentStreamWriter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDFontDescriptor;
 import org.apache.pdfbox.util.PDFImageWriter;
+import org.apache.pdfbox.util.PDFOperator;
 import org.apache.pdfbox.util.PDFTextStripper;
 import org.apache.pdfbox.util.TextPosition;
 
@@ -69,13 +71,13 @@ public class PdfToHtmlConverter extends PDFTextStripper {
             	
             	System.out.print("Behandler side " + i);
 
-                images.add( file.getName() +(int)(i+1) + ".png");
+                images.add(file.getName() +(int)(i+1) + ".png");
                 
             	// Legger til CSS bakgrunn i DIV klasse
         		html.append( 
         				"<div class=\"background\" style=\"position: absolute; width: " + img.getWidth()
         				+ "; height: " + img.getHeight() 
-        				+ "; background: url('file:" +  file.getName() +(int)(i+1)+".png') "
+        				+ "; background: url('file:" +  file.getName() +(int)(i+1) + ".png') "
         				+ "top left no-repeat; margin-top: "+ toppMargBilde 
         				+ "\">");
         		
@@ -91,23 +93,41 @@ public class PdfToHtmlConverter extends PDFTextStripper {
             				);
             	}
 
+            	html.append("</span> \n");
+            	html.append( "</div> \n");
             }
              
-            // Parser pr side
+            // Parser pr side og fjerner text fra bakgrunnsbilde
             for( int i=0; i<alleSider.size(); i++ ) 
             {
-            	PDPage page = alleSider.get( i );
+            	PDPage side = alleSider.get( i );
                 
-            	PDFStreamParser parser = new PDFStreamParser(page.getContents());
-                parser.parse();
+            	PDFStreamParser behandler = new PDFStreamParser(side.getContents());
+                behandler.parse();
                 
-            	List<Object> tokens = parser.getTokens();
+                List tokens = behandler.getTokens();
+                List nyeTokens = new ArrayList();
                 
-                PDStream newContents = new PDStream(doc);
-                ContentStreamWriter writer = new ContentStreamWriter(newContents.createOutputStream());
+                for( int j=0; j<tokens.size(); j++)
+                {
+                    Object token = tokens.get( j );
+                    if( token instanceof PDFOperator )
+                    {
+                        PDFOperator op = (PDFOperator)token;
+                        if( op.getOperation().equals( "TJ") || op.getOperation().equals( "Tj" ))
+                        {
+                            nyeTokens.remove( nyeTokens.size() -1 );
+                            continue;
+                        }
+                    }
+                    nyeTokens.add(token);
+                }
                 
-                writer.writeTokens(tokens);
-                page.setContents(newContents);
+                PDStream nyttInnhold = new PDStream(doc);
+                
+                ContentStreamWriter skriver = new ContentStreamWriter( nyttInnhold.createOutputStream() );
+                skriver.writeTokens(nyeTokens);
+                side.setContents(nyttInnhold);
             }
             
             // Skriver bilder til disk
@@ -123,15 +143,12 @@ public class PdfToHtmlConverter extends PDFTextStripper {
             		, BufferedImage.TYPE_INT_RGB
             		, (int) (resolution));
             
-            
             if (!success)
             {
                 System.err.println("Feilet ved skriving av image");
             }
             
             // Fullfører HTML kode
-        	html.append("</span> \n");
-        	html.append( "</div> \n");
         	html.append("</body> \n</html>");
             
         }
@@ -146,47 +163,41 @@ public class PdfToHtmlConverter extends PDFTextStripper {
 	
     protected void processTextPosition(TextPosition text)
     {
-    	try 
-    	{
-    		int fontStr = Math.round(text.getFontSizeInPt()/ 72 * resolution );
-    		int margTopp = (int)((text.getYDirAdj()) - fontStr);
-       		int margVenstre = (int)((text.getXDirAdj()));
-       		String fontnavn = "";
-       		PDFontDescriptor fontinfo = text.getFont().getFontDescriptor();
-       		if(fontinfo != null)
-       		{
-       			fontnavn = fontinfo.getFontName();
-       		}
-       		
-    		int indexPlus = fontnavn.indexOf("+");
-    		if (indexPlus != -1) {
-    			fontnavn = fontnavn.substring(indexPlus+1);
-    		}
-    		boolean isBold = fontnavn.contains("Bold");
-    		boolean isItalic = fontnavn.contains("Italic");
+		int fontStr = Math.round(text.getFontSizeInPt() );
+		int margTopp = (int)((text.getYDirAdj()) - fontStr);
+   		int margVenstre = (int)((text.getXDirAdj()));
 
-    		int indexDash = fontnavn.indexOf("-");
-    		if (indexDash != -1) {
-    			fontnavn = fontnavn.substring(0, indexDash);
-    		}
-    		int indexComa = fontnavn.indexOf(",");
-    		if (indexComa != -1) {
-    			fontnavn = fontnavn.substring(0, indexComa);
-    		}
-    	
-        	htmloppsett(text, margVenstre,  margTopp, fontStr, fontnavn, isBold, isItalic);
-             
-		} catch (IOException e) {
-			e.printStackTrace();
+   		PDFont font = text.getFont();
+		PDFontDescriptor fontDescriptor = font.getFontDescriptor();
+		
+		String fontString = "";
+		if (fontDescriptor != null) {
+    		fontString = fontDescriptor.getFontName();    			
 		}
-    }	
-    
-    
-    private void htmloppsett(TextPosition text, int marginLeft, int marginTop, int fontSizePx, String fontString, boolean isBold, boolean isItalic) throws IOException {
-		html.append(
-				"<span style=\"position: absolute; margin-left:"+marginLeft
-				+ "px; margin-top: " + marginTop + "px; "
-				+ "font-size: "+fontSizePx + "px; "
+		else {
+			fontString = "";	
+		}
+
+		int indexPlus = fontString.indexOf("+");
+		if (indexPlus != -1) {
+			fontString = fontString.substring(indexPlus+1);
+		}
+		boolean isBold = fontString.contains("Bold");
+		boolean isItalic = fontString.contains("Italic");
+
+		int indexDash = fontString.indexOf("-");
+		if (indexDash != -1) {
+			fontString = fontString.substring(0, indexDash);
+		}
+		int indexComa = fontString.indexOf(",");
+		if (indexComa != -1) {
+			fontString = fontString.substring(0, indexComa);
+		}
+	
+    	html.append(
+				"<span style=\"position: absolute; margin-left:"+margVenstre
+				+ "px; margin-top: " + margTopp + "px; "
+				+ "font-size: "+fontStr + "px; "
 				+ "font-family:"+fontString+";");
 		if (isBold) {
 			html.append("font-weight: bold;");
@@ -198,9 +209,9 @@ public class PdfToHtmlConverter extends PDFTextStripper {
 	
 		html.append(text.getCharacter());
 
-		html.append("</span>\n"); 
-    }
-
+		html.append("</span>\n"); 		
+    }	
+    
 	public List<String> getImages() {
 		return images;
 	}
