@@ -3,14 +3,9 @@ package gui.domain;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,41 +27,13 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
 	
 	private int marginTopBackground = 0;
 
-	private int lastMarginTop = 0;
-		
 	float previousAveCharWidth = -1;
-    private int resolution = 72; //default resolution
-
-    private boolean needToStartNewSpan = false;
     
-    private int lastMarginLeft = 0;
-    private int lastMarginRight = 0;
-    private int numberSpace = 0;
-    private int sizeAllSpace = 0;
-    private boolean addSpace;
-    private int startXLine;
-	private boolean wasBold = false;
-	private boolean wasItalic = false;
-	private int lastFontSizePx = 0;
-	private String lastFontString = "";
+	private int resolution = 72; 
 	
-    private StringBuffer currentLine = new StringBuffer();
-
-
-   /**
-    * Public constructor
-    * @param outputFileName The html file
-    * @param type represents how we are going to create the html file
-    * 			0: we create a new block for every letters
-    * 			1: we create a new block for every words
-    * 			2: we create a new block for every line 
-    * 			3: we create a new block for every line - using a cache to set the word-spacing property
-    * @param zoom 1.5 - 2 is a good range
-    * @throws IOException
-    */
-    public ConvertPdfToHtmlFile(String outputFileName, int type, float zoom) throws IOException{
-    	try {
-			htmlFile = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileName),"UTF8"));
+   //Konverterer pdf til HTML
+    public ConvertPdfToHtmlFile(File file) throws IOException{
+    		htmlFile = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),"UTF8"));
 			String header =
 					"<html>" +
 					"<head> \r\n" +
@@ -75,24 +42,10 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
 					"</head>" +
 					"<body>";
 			htmlFile.write(header);
-			
-		}
-    	catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-            System.err.println( "Error: Unsupported encoding." );
-		}
-    	catch (FileNotFoundException e) {
-			e.printStackTrace();
-            System.err.println( "Error: File not found." );
-		}
-    	catch (IOException e) {
-			e.printStackTrace();
-            System.err.println( "Error: IO error, could not open html file." );
-		}
 	}
 	
     /**
-     * Close the HTML file
+     * Lukker HTML filen
      */
 	public void closeFile() {
 		try {
@@ -168,8 +121,8 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
                 PDPage page = (PDPage)allPages.get( i );
                 PDFStreamParser parser = new PDFStreamParser(page.getContents());
                 parser.parse();
-                List tokens = parser.getTokens();
-                List newTokens = new ArrayList();
+                List<Object> tokens = parser.getTokens();
+                 ArrayList<Object> newTokens = new ArrayList<Object>();
                 for( int j=0; j<tokens.size(); j++)
                 {
                     Object token = tokens.get( j );
@@ -184,34 +137,34 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
                         }
                     }
                     newTokens.add( token );
-
                 }
                 PDStream newContents = new PDStream( document );
                 ContentStreamWriter writer = new ContentStreamWriter( newContents.createOutputStream() );
                 writer.writeTokens( newTokens );
-                //newContents.addCompression(); //Looks like it faster without the compression, but no extensive tests have been run.
                 page.setContents( newContents );
             }
-            
-            //Save background images
-            //TODO: Do not save the image if it's blank. (Retrieve the text of one page, remove it from the document, get the image, check if it's blank, save it or not and write the html file)
             PDFImageWriter imageWriter = new PDFImageWriter();
             
             String imageFormat = "png";
-            String password = "";
             int startPage = 1;
             int endPage = Integer.MAX_VALUE;
             String outputPrefix = pathToPdf.substring(0, positionLastSlash)+fileName;
             int imageType = BufferedImage.TYPE_INT_RGB;
             
 
-            boolean success = imageWriter.writeImage(document, imageFormat, password,
-                    startPage, endPage, outputPrefix, imageType, (int) (resolution));
+            boolean success = imageWriter.writeImage(
+            		document
+            		, imageFormat
+            		, ""
+            		,startPage
+            		, endPage
+            		, outputPrefix
+            		, imageType
+            		, (int) (resolution));
             if (!success)
             {
                 System.err.println( "Error: no writer found for image format '"
                         + imageFormat + "'" );
-                System.exit(1);
             }
             
         }
@@ -222,17 +175,10 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
         }
 	}
 	
-    /**
-     * A method provided as an event interface to allow a subclass to perform
-     * some specific functionality when text needs to be processed.
-     *
-     * @param text The text to be processed
-     */
     protected void processTextPosition( TextPosition text )
     {
     	try {
     		
-
        		int marginLeft = (int)((text.getXDirAdj()));
     		int fontSizePx = Math.round(text.getFontSizeInPt()/ 72 * resolution );
     		int marginTop = (int)((text.getYDirAdj()) - fontSizePx);
@@ -279,19 +225,6 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
     }	
     
     
-    /** 
-     * The method that given one character is going to write it in the HTML file.
-     * 
-     * @param text
-     * @param marginLeft
-     * @param marginTop
-     * @param fontSizePx
-     * @param fontString
-     * @param isBold
-     * @param isItalic
-     * @throws IOException 
-
-     */
     private void renderingSimple(TextPosition text, int marginLeft, int marginTop, int fontSizePx, String fontString, boolean isBold, boolean isItalic) throws IOException {
 		htmlFile.write("<span style=\"position: absolute; margin-left:"+marginLeft+"px; margin-top: "+marginTop+"px; font-size: "+fontSizePx+"px; font-family:"+fontString+";");
 		if (isBold) {
@@ -308,8 +241,5 @@ public class ConvertPdfToHtmlFile extends PDFTextStripper{
 		htmlFile.write("</span>"); 
 		htmlFile.newLine();
     }
-    
-    
-        
     
 }

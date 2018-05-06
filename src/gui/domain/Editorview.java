@@ -83,10 +83,9 @@ public class Editorview extends JPanel implements DocumentListener {
 		
 		System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
 
-		String htmlFilnavn = f.getName().replaceAll(".pdf", ".html");
 		try {
 			
-			ConvertPdfToHtmlFile htmlFile = new ConvertPdfToHtmlFile(htmlFilnavn, 1, 1);
+			ConvertPdfToHtmlFile htmlFile = new ConvertPdfToHtmlFile(f);
 			htmlFile.convertPdfToHtml(f.getName());
 			htmlFile.closeFile();
 			
@@ -98,6 +97,7 @@ public class Editorview extends JPanel implements DocumentListener {
 		String content = "";
 		if(f.exists() && !f.isDirectory()) { 
 			try {
+				String htmlFilnavn = f.getName().replaceAll(".pdf", ".html");
 		        BufferedReader in = new BufferedReader(new FileReader(htmlFilnavn));
 		        String str;
 		        while ((str = in.readLine()) != null) {
