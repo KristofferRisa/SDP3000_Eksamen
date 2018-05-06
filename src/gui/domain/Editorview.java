@@ -16,6 +16,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 
 
@@ -24,37 +26,50 @@ import controller.Controller;
 public class Editorview extends JPanel implements DocumentListener {
 		
 	JTextArea text = new JTextArea();
+	
 	File file = new File (".");
+	
 	JFileChooser jf = new JFileChooser(file);
-	private PDDocument doc;
 	
 	public Editorview() {
+		
+		FileNameExtensionFilter pdfFilter = new FileNameExtensionFilter("PDF Files", "pdf");
+		jf.setFileFilter(pdfFilter);
+		
 		setLayout(new BorderLayout());
 		add(new JScrollPane(text));
+		
 		text.getDocument().addDocumentListener(this);
 	}
 	
 	public void save() {
+		
 		jf.setApproveButtonText("Lagre tekstfil");
 		jf.setCurrentDirectory(file);
 		jf.showSaveDialog(null);		
+		
 		if ((file = jf.getSelectedFile())!=null) {
 			saveTo(file);
 		}
 	}
 	
 	private void saveTo(File f) {			
+		
 		try {
+			
 			FileOutputStream fo = new FileOutputStream(f);
 			fo.write(text.getText().getBytes());
 			fo.close();
+			
 		} catch (Exception e) {}				
 	}
 
-	public void load() {		
+	public void load() {
+		
 		jf.setApproveButtonText("Velg tekstfil");
 		jf.setCurrentDirectory(file);
 		jf.showOpenDialog(null);
+		
 		if ((file = jf.getSelectedFile())!=null) {			
 			text.setText(loadFrom(file));
 		}
@@ -65,16 +80,12 @@ public class Editorview extends JPanel implements DocumentListener {
 	}
 	
 	private String loadFrom(File f) {
-		String content = "";
+		
 		System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
-
-//			doc = PDDocument.load(f);
-		//content = new PDFTextStripper().getText(doc);
-//            content = new PDFText2HTML().getText(doc);
-//			content = new PdfToHtmlConverter().getText(doc);
 
 		String htmlFilnavn = f.getName().replaceAll(".pdf", ".html");
 		try {
+			
 			ConvertPdfToHtmlFile htmlFile = new ConvertPdfToHtmlFile(htmlFilnavn, 1, 1);
 			htmlFile.convertPdfToHtml(f.getName());
 			htmlFile.closeFile();
@@ -84,6 +95,7 @@ public class Editorview extends JPanel implements DocumentListener {
 			e.printStackTrace();
 		}
 		
+		String content = "";
 		if(f.exists() && !f.isDirectory()) { 
 			try {
 		        BufferedReader in = new BufferedReader(new FileReader(htmlFilnavn));
@@ -125,8 +137,6 @@ public class Editorview extends JPanel implements DocumentListener {
 				e.printStackTrace();
 			}
 		}
-			
-		
 	}
 		
 }
