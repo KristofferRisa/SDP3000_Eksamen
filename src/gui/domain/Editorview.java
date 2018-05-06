@@ -1,9 +1,14 @@
 package gui.domain;
 
 import java.awt.BorderLayout;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -11,7 +16,7 @@ import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
+
 
 import controller.Controller;
 
@@ -60,16 +65,37 @@ public class Editorview extends JPanel implements DocumentListener {
 	
 	private String loadFrom(File f) {
 		String content = "";
+		System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
+
+//			doc = PDDocument.load(f);
+		//content = new PDFTextStripper().getText(doc);
+//            content = new PDFText2HTML().getText(doc);
+//			content = new PdfToHtmlConverter().getText(doc);
+
+		String filenameoutput = "test.html";
 		try {
-			System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
+			HtmlFile htmlFile = new HtmlFile(filenameoutput, 1, 1);
+			htmlFile.convertPdfToHtml(f.getName());
+			htmlFile.closeFile();
 			
-			doc = PDDocument.load(f);
-            //content = new PDFTextStripper().getText(doc);
-            content = new PDFText2HTML().getText(doc);
+		} catch (Exception e) {
+		    System.err.println( "Filed to convert Pdf to Html." );
+			e.printStackTrace();
 		}
-		catch (IOException e) {
-            System.out.println(e.getMessage());
+		
+		f = new File(filenameoutput);
+		if(f.exists() && !f.isDirectory()) { 
+			try {
+		        BufferedReader in = new BufferedReader(new FileReader(filenameoutput));
+		        String str;
+		        while ((str = in.readLine()) != null) {
+		            content +=str;
+		        }
+		        in.close();
+		    	} catch (IOException e) {
+		    }
 		}
+		
 		return content;
 	}
 

@@ -6,8 +6,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="var" path="pdfbox-2.0.9"/>
-	<classpathentry kind="var" path="fontbox-2.0.9"/>
 	<classpathentry kind="var" path="commons-logging-1.2"/>
+	<classpathentry kind="var" path="fontbox-1.8.14"/>
+	<classpathentry kind="var" path="jempbox-1.8.14"/>
+	<classpathentry kind="var" path="pdfbox-1.8.14"/>
+	<classpathentry kind="var" path="preflight-1.8.14"/>
+	<classpathentry kind="var" path="xmpbox-1.8.14"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,145 +1,61 @@
 //package gui.domain;
-///*
-// * Licensed to the Apache Software Foundation (ASF) under one or more
-// * contributor license agreements.  See the NOTICE file distributed with
-// * this work for additional information regarding copyright ownership.
-// * The ASF licenses this file to You under the Apache License, Version 2.0
-// * (the "License"); you may not use this file except in compliance with
-// * the License.  You may obtain a copy of the License at
-// *
-// *      http://www.apache.org/licenses/LICENSE-2.0
-// *
-// * Unless required by applicable law or agreed to in writing, software
-// * distributed under the License is distributed on an "AS IS" BASIS,
-// * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// * See the License for the specific language governing permissions and
-// * limitations under the License.
-// */
 //
-//
-//import java.awt.peer.TrayIconPeer;
-//import java.io.File;
 //import java.io.IOException;
-//import java.nio.file.FileSystems;
-//import java.nio.file.Path;
-//import java.nio.file.Paths;
 //import java.util.ArrayList;
 //import java.util.HashSet;
 //import java.util.Iterator;
 //import java.util.List;
 //import java.util.Set;
 //
-//import javax.imageio.ImageIO;
-//
-//import org.apache.pdfbox.cos.COSName;
 //import org.apache.pdfbox.pdmodel.PDDocument;
-//import org.apache.pdfbox.pdmodel.PDPage;
-//import org.apache.pdfbox.pdmodel.PDPageTree;
-//import org.apache.pdfbox.pdmodel.PDResources;
 //import org.apache.pdfbox.pdmodel.font.PDFontDescriptor;
-//import org.apache.pdfbox.pdmodel.graphics.PDXObject;
 //import org.apache.pdfbox.text.PDFTextStripper;
 //import org.apache.pdfbox.text.TextPosition;
 //
-///**
-// * Wrap stripped text in simple HTML, trying to form HTML paragraphs. Paragraphs
-// * broken by pages, columns, or figures are not mended.
-// *
-// * @author John J Barton
-// * 
-// */
-//public class PDFText2HTML extends PDFTextStripper
+//
+//public class PdfToHtmlConverter extends  PDFTextStripper
 //{
-//    private static final int INITIAL_PDF_TO_HTML_BYTES = 8192;
 //
-//    private final FontState fontState = new FontState();
+//	private static final int INITIAL_PDF_TO_HTML_BYTES = 8192;
+//	
+//	private final FontState fontState = new FontState();
 //
-//    /**
-//     * Constructor.
-//     * @throws IOException If there is an error during initialization.
-//     */
-//    public PDFText2HTML() throws IOException
-//    {
-//        super();
-//        setLineSeparator(LINE_SEPARATOR);
-//        setParagraphStart("<p>");
+//	public PdfToHtmlConverter() throws IOException {
+//		super();
+//		
+//		setLineSeparator(LINE_SEPARATOR);
+//        
+//		setParagraphStart("<p>");
 //        setParagraphEnd("</p>"+ LINE_SEPARATOR);
+//        
 //        setPageStart("<div style=\"page-break-before:always; page-break-after:always\">");
 //        setPageEnd("</div>"+ LINE_SEPARATOR);
+//        
 //        setArticleStart(LINE_SEPARATOR);
 //        setArticleEnd(LINE_SEPARATOR);
-//    }
+//	}
+//	
+//	@Override
+//	protected void startDocument(PDDocument doc) throws IOException
+//	{
+//		StringBuilder buf = new StringBuilder(INITIAL_PDF_TO_HTML_BYTES);
+//      
+//		buf.append("<html>\n");
+//		buf.append("<head>\n");
+//		buf.append("<title>").append(escape(getTitle())).append("</title>\n");
+//		//      buf.append("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=\"UTF-8\">\n");
+//		buf.append("</head>\n");
+//		buf.append("<body>\n");      
+//		  
+//		super.writeString(buf.toString());
+//	}
 //
-//    /**
-//     * Write the header to the output document. Now also writes the tag defining
-//     * the character encoding.
-//     *
-//     * @throws IOException
-//     *             If there is a problem writing out the header to the document.
-//     * @deprecated deprecated, use {@link #startDocument(PDDocument)}
-//     */
-//    protected void writeHeader() throws IOException
-//    {
-//    }
-//
-//    @Override
-//    protected void startDocument(PDDocument document) throws IOException
-//    {
-//        StringBuilder buf = new StringBuilder(INITIAL_PDF_TO_HTML_BYTES);
-////        buf.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"" + "\n"
-////                + "\"http://www.w3.org/TR/html4/loose.dtd\">\n");
-//        buf.append("<html>\n");
-//        buf.append("<head>\n");
-//        buf.append("<title>").append(escape(getTitle())).append("</title>\n");
-////        buf.append("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=\"UTF-8\">\n");
-//        buf.append("</head>\n");
-//        buf.append("<body>\n");
-//        
-//        
-//        //Bilder - forsøk men se her da det er ekstremt vanskelig : https://issues.apache.org/jira/browse/PDFBOX-3926
-//        //Skaffe posisjon: http://svn.apache.org/viewvc/pdfbox/trunk/examples/src/main/java/org/apache/pdfbox/examples/util/PrintImageLocations.java?view=markup
-//        PDPageTree list = document.getPages();
-//        //Finne relativ bane
-//        Path path = Paths.get(System.getProperty("user.home"),"tempimg/");  
-//        for (PDPage page : list) {
-//            PDResources pdResources = page.getResources();
-//            for (COSName c : pdResources.getXObjectNames()) {
-//                PDXObject o = pdResources.getXObject(c);
-//                if (o instanceof org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) {
-//                	//Debug filbane          	
-//                	System.out.println("Relativ bane: " + path);
-//                	//Lage unikt filnavn
-//                	long fileName = System.nanoTime();
-//                	//assosiere path objektet med variabelen filbane
-//                	String filbane = path.toString();
-//                	//Lagre bildefil til relativ bane
-//                    File file = new File(filbane + fileName + ".png");
-//                    //skrive filbane i htmldokumentet
-//                    buf.append("<img src=\"file:/" + filbane +fileName + ".png\">\n");
-//                    ImageIO.write(((org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject)o).getImage(), "png", file);
-//                }
-//            }
-//        }
-//        
-//        
-//        super.writeString(buf.toString());
-//    }
-//    
-//    /**
-//     * {@inheritDoc}
-//     */
 //    @Override
 //    public void endDocument(PDDocument document) throws IOException
 //    {
 //        super.writeString("</body></html>");
 //    }
-//
-//    /**
-//     * This method will attempt to guess the title of the document using
-//     * either the document properties or the first lines of text.
-//     *
-//     * @return returns the title.
-//     */
+//    
 //    protected String getTitle()
 //    {
 //        String titleGuess = document.getDocumentInformation().getTitle();
@@ -177,35 +93,7 @@
 //        }
 //        return "";
 //    }
-//
-//
-//    /**
-//     * Write out the article separator (div tag) with proper text direction
-//     * information.
-//     *
-//     * @param isLTR true if direction of text is left to right
-//     * @throws IOException
-//     *             If there is an error writing to the stream.
-//     */
-//    @Override
-//    protected void startArticle(boolean isLTR) throws IOException
-//    {
-//        if (isLTR)
-//        {
-//            super.writeString("<div>");
-//        }
-//        else
-//        {
-//            super.writeString("<div dir=\"RTL\">");
-//        }
-//    }
-//
-//    /**
-//     * Write out the article separator.
-//     *
-//     * @throws IOException
-//     *             If there is an error writing to the stream.
-//     */
+//    
 //    @Override
 //    protected void endArticle() throws IOException
 //    {
@@ -213,38 +101,18 @@
 //        super.writeString("</div>");
 //    }
 //
-//    /**
-//     * Write a string to the output stream, maintain font state, and escape some HTML characters.
-//     * The font state is only preserved per word.
-//     *
-//     * @param text The text to write to the stream.
-//     * @param textPositions the corresponding text positions
-//     * @throws IOException If there is an error writing to the stream.
-//     */
 //    @Override
 //    protected void writeString(String text, List<TextPosition> textPositions) throws IOException
 //    {
 //        super.writeString(fontState.push(text, textPositions));
 //    }
-//
-//    /**
-//     * Write a string to the output stream and escape some HTML characters.
-//     *
-//     * @param chars String to be written to the stream
-//     * @throws IOException
-//     *             If there is an error writing to the stream.
-//     */
+//    
 //    @Override
 //    protected void writeString(String chars) throws IOException
 //    {
 //        super.writeString(escape(chars));
 //    }
-//
-//    /**
-//     * Writes the paragraph end "&lt;/p&gt;" to the output. Furthermore, it will also clear the font state.
-//     * 
-//     * {@inheritDoc}
-//     */
+//    
 //    @Override
 //    protected void writeParagraphEnd() throws IOException
 //    {
@@ -253,13 +121,7 @@
 //        
 //        super.writeParagraphEnd();
 //    }
-//
-//    /**
-//     * Escape some HTML characters.
-//     *
-//     * @param chars String to be escaped
-//     * @return returns escaped String.
-//     */
+//    
 //    private static String escape(String chars)
 //    {
 //        StringBuilder builder = new StringBuilder(chars.length());
@@ -269,7 +131,7 @@
 //        }
 //        return builder.toString();
 //    }
-//
+//    
 //    private static void appendEscaped(StringBuilder builder, char character)
 //    {
 //        // write non-ASCII as named entities
@@ -299,13 +161,7 @@
 //            }
 //        }
 //    }
-//
-//    /**
-//     * A helper class to maintain the current font state. It's public methods will emit opening and
-//     * closing tags as needed, and in the correct order.
-//     *
-//     * @author Axel DÃ¶rfler
-//     */
+//    
 //    private static class FontState
 //    {
 //        private final List<String> stateList = new ArrayList<String>();
@@ -454,4 +310,5 @@
 //            return descriptor.getFontName().contains("Italic");
 //        }
 //    }
+//
 //}
